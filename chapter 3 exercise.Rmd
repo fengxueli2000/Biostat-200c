@@ -1,0 +1,62 @@
+---
+title: "chapter 3 practice and exercise"
+author: "Fengxue Li"
+date: '2022-04-22'
+output: html_document
+---
+
+```{r}
+library(faraway)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+lmod <- glm(cbind(damage,6-damage) ~ temp, family=binomial,orings)
+sumary(lmod)
+x <- seq(25,85,1)
+plot(damage/6 ~ temp, orings, xlim=c(25,85), ylim = c(0,1), xlab=" Temperature", ylab="Prob of damage") +
+lines(x,ilogit(11.6630-0.2162*x))
+pchisq(deviance(lmod),df.residual(lmod),lower=FALSE)
+deviance(lmod)
+pchisq(64.5,12,lower=FALSE)
+df.residual(lmod)
+pchisq(38.9-16.9,1,lower=FALSE)
+data(troutegg, package="faraway")
+```
+
+
+```{r}
+data(turtle)
+attach(turtle, warn.conflicts = FALSE)
+glmmodel <- glm(cbind(male, female) ~ temp, family = "binomial", data = turtle)
+summary(glmmodel)
+pchisq(deviance(glmmodel),
+       df.residual(glmmodel),lower=FALSE)
+# the model does not fit the data
+(sigma2 <- sum(residuals(glmmodel,type="pearson")^2)/12)
+# sigma2 is greater than 1, so tha data sparse
+halfnorm(cooks.distance(glmmodel))
+halfnorm(residuals(glmmodel))
+turtle$qua <- turtle$temp^2
+glmmodel2 <- glm(cbind(male, female) ~ qua + temp, family = "binomial", data = turtle)
+summary(glmmodel2)
+pchisq(deviance(glmmodel2),
+       df.residual(glmmodel2),lower=FALSE)
+pchisq(64.5,12,lower=FALSE)
+```
+
+
+```{r}
+data(seeds)
+seeds = seeds%>%mutate(box = as.factor(rep(1:8,each=6)))
+bmod = glm(cbind(germ,100-germ) ~ covered + box +
+             moisture,family = binomial, data = seeds)
+summary(bmod)
+drop1(bmod, test = "Chi")
+seeds = seeds%>%mutate(moisture2 = moisture^2)
+bmod2 = glm(cbind(germ,100-germ) ~ covered*moisture  + moisture2,
+            family = binomial, data = seeds)
+summary(bmod2)
+```
+
