@@ -1,0 +1,177 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+
+int_ = 1
+print('类型??<ba>:%s' % type(int_))
+#class: <class 'int'>
+
+
+##flot
+
+float_ = 1.0
+print('类型??<ba>:%s' % type(float_))
+##class: <class 'float'>
+
+
+##varchar
+'hello' "hello"
+##it can be use "", '' '','''   ''',
+
+
+string_ = '关于我学数学这B档事??<bf> '
+print('type:%s' % type(string_))
+print(string_)
+##类型??<ba>: <class 'str'>
+
+
+
+#bool
+#True、False，要么是True，要么是False，在Python中，可以直接用True、False表示布尔值（请注意大小写），也可以通过逻辑运算得到( > <=)。布尔值一般用在程序流程的控制中，程序可以根据这个布尔判断进行下一步的工作??<82>
+
+
+bool_ = True
+print('类型??<ba>:%s' % type(bool_))
+#类型??<ba>: <class 'bool'>
+
+
+'transfer'
+'int()：change to the intager'
+'float(): same'
+'str()：change to the world'
+'chr()：change the int to the varchar'
+'ord()：change var to int'
+
+
+
+print(float_)
+print(int(float_))
+print(str(float_))
+
+
+
+
+
+'class branch'
+'if else elif'
+
+#if condition1:  # 条件后要加冒号，结果必须换行与缩??<9b>
+#   result1
+#elif condition2:
+#    result2
+#else:
+#   result3
+
+# example
+#
+a = 10  # 定义a,b,c三个变量，ab是运算对象，c是运算结??<9c>
+b = 5
+c = 0
+x = input('what do you want??<9a>')  # x是我们输入的运算??<a6>
+# 根据我们输入的运算符来选择相应的运算公??<8f>
+if x == '+':
+    c = a + b
+    print('{}{}{}={}'.format(a, x, b, c))
+elif x == '-':
+    c = a - b
+    print('{}{}{}={}'.format(a, x, b, c))
+elif x == '*':
+    c = a * b
+    print('{}{}{}={}'.format(a, x, b, c))
+elif x == '/':
+    c = a / b
+    print('{}{}{}={}'.format(a, x, b, c))
+else:
+    print('correct your answer')
+
+
+#loop
+
+
+
+list_ = [3, 2, 1]  # 列表，是序列的一??<8d>
+
+len(list_)
+
+range(101)
+range(0, 101)
+#for in loop
+#    product
+#    for value in range():
+#        value will qual the value in the product
+
+
+count = 1
+for i in [3, 6, 4, 32, 3]:
+    print('\n现在执行第{}次循环，输出的值是：{}'.format(count, i))
+    count = count + 1
+
+
+
+
+sum = 0
+for x in range(5):
+    sum = x + sum
+    print('\nthis is {} times ，sum current value：{}'.format(x + 1, sum))#不想看这个可以不写这个print
+print('\ntotal value??<9a>%d' % sum)
+
+
+
+#while loop
+
+#while format()
+
+
+tempreture = 0  # 设置变量 并赋值为0
+while (tempreture <=105):  # 若温??<a6><=105度，则继续执行循??<af>
+    print('你的体温正在上升：{}'.format(tempreture))
+    tempreture = tempreture + 15  # 每一次循环，变量都增??<a0>15
+print("\n我热爱{}°C的你".format(tempreture - 15))
+
+
+
+print('------- little bit ex ------------')
+for i in range(5):
+    input_ = input('（想要结束请输入0）请输入你看到的聊天记录：\n')
+    if 'baby' in input_:
+        print('\nloving u')
+        print('-' * 20)
+    elif 'dady' in input_:
+        print('im here ')
+        print('-' * 20)
+        break
+    else:
+        print('idk')
+        print('-' * 20)
+
+
+print( '------model using -------')
+
+print('format??<9a> from 模块 import 功能')
+
+print('-------------example-----------------')
+
+
+from math import sin
+sin(10)
+
+
+print ('---------define function-------')
+

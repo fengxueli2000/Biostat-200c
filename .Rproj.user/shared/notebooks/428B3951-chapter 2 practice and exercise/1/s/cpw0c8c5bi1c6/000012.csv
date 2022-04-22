@@ -1,0 +1,2 @@
+"0","ggplot(wbca, aes(x=BNucl, color=as.factor(Class))) + "
+"0","            geom_histogram(position=""dodge"", binwidth=1)"

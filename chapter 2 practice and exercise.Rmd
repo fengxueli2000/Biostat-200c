@@ -1,0 +1,178 @@
+---
+title: "chapter 2 practice and exercise"
+author: "Fengxue Li"
+date: '2022-04-16'
+output: html_document
+---
+
+```{r}
+library(faraway)
+library(tidyverse)
+library(ggplot2)
+library(pROC)
+```
+# exercise 1
+
+```{r}
+data("wbca")
+summary(wbca)
+help("wbca")
+```
+
+a)i
+```{r}
+plot(Class ~ BNucl, wbca)
+```
+it is because class is only 1 or 0.
+
+ii.
+```{r}
+class(wbca$Class)
+wbca$Class <- as.factor(wbca$Class)
+plot(BNucl ~ Class, wbca)
+```
+class zero are almost all 10, class one are almost all one
+
+```{r}
+wbca$Class <- as.numeric(as.character(wbca$Class))
+plot(jitter(Class,0.1) ~ jitter(BNucl), wbca, xlab="bare nuclei", ylab="
+Class", pch=".")
+```
+
+most bare nuclei are 1 and 10
+```{r}
+ggplot(wbca, aes(x=BNucl, color=as.factor(Class))) + 
+            geom_histogram(position="dodge", binwidth=1)
+```
+
+b.
+
+```{r}
+ggplot(wbca, aes(x=Thick,y=BNucl))+
+        geom_point(alpha=0.2, position=position_jitter())+
+        facet_grid(~ as.factor(Class))
+
+ggplot(wbca, aes(x=BNucl,y=Thick))+
+  geom_point(alpha=0.2, position= position_jitter())+
+  facet_grid(~ as.factor(Class))
+```
+
+c.
+
+```{r}
+lmod <- glm(Class ~ ., family=binomial, wbca)
+summary(lmod)
+```
+
+d.
+```{r}
+llmod <-  step(lmod, trace=1)
+```
+```{r}
+summary(llmod)
+```
+
+```{r}
+wbca <- mutate(wbca, predprob = predict(llmod, type = "response"))
+wbca$pred <- ifelse(wbca$predprob > 0.5, 0,
+                    1)
+xtabs( ~ Class + pred, wbca)
+```
+
+```{r}
+library(pROC)
+lmod_roc <- roc( Class ~pred, wbca)
+ggroc(lmod_roc)
+auc(lmod_roc)
+```
+
+h.
+```{r}
+data("wbca")
+wbca <- wbca %>% 
+  select(-predprob, -pred, - class)
+seqtest <- seq(3,618,3)
+test <- wbca[seqtest,]
+train <- wbca[-seqtest,]
+lmodsub <- glm(Class ~ ., family=binomial, data =  train)
+summary(lmodsub)
+llmodsub <- step(lmodsub)
+summary(llmodsub)
+test$predprob <-  predict(llmodsub ,newdata  = test,  type = "response")
+test$out <- ifelse(test$predprob > 0.9, 0,
+                    1)
+xtabs( ~ Class + out, test)
+lmod_roc <- roc(Class ~ out, test)
+plot(lmod_roc,print.auc=TRUE,plot=TRUE,
+print.thres=TRUE)
+ggroc(lmod_roc)
+```
+
+# 2.2
+```{r}
+library(faraway)
+library(tidyverse)
+data("pima")
+help(pima)
+```
+
+a.
+```{r}
+nomiss <- data("pima")
+class(pima$test)
+class(pima$insulin)
+pima$test1<- as.factor(pima$test)
+ggplot(pima, aes(x=insulin, color=test1)) + 
+            geom_histogram()
+
+```
+
+b.
+```{r}
+pima$insulin[is.na(pima$insulin)] <- 0
+ggplot(pima, aes(x=insulin, color=test1)) + 
+            geom_histogram()
+```
+
+```{r}
+pima.completecase=na.omit(pima)
+pima$glucose[is.na(pima$glucose)] <- 0
+pima$diastolic[is.na(pima$diastolic)] <- 0
+pima$triceps[is.na(pima$triceps)] <- 0
+pima$bmi[is.na(pima$bmi)] <- 0
+model1=glm(test ~ . , data=pima.completecase, family=binomial)
+sumary(model1)
+```
+
+```{r}
+modelfit=glm(test ~ pregnant + glucose + diastolic  +
+            bmi + diabetes + age , data=pima.completecase, 
+            family=binomial)
+summary(modelfit)
+```
+
+```{r}
+anova(modelfit, model1, test = "Chi")
+```
+
+no significant difference 
+
+e.
+
+```{r}
+drop1(model1)
+```
+
+```{r}
+summary(pima$bmi)
+exp(coef(model1)["bmi"]*(36-27))
+```
+
+
+# 3
+https://rpubs.com/tmuse987/541654
+# 3.3
+https://www.coursehero.com/file/41198316/Solutionsdocx/
+# 7.1
+https://rpubs.com/pkowalchuk/550350
+

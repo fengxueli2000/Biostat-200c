@@ -1,0 +1,6 @@
+lmod <- glm(chd ~ height + cigs, family = binomial, wcgs)
+predprob <- predict(lmod, type = "response")
+predprob %>% head(10)
+lmod2 <- glm(Class ~ ., family=binomial, wbca)
+predprob2 <- predict(lmod2, type = "response")
+predprob2 %>% head(10)

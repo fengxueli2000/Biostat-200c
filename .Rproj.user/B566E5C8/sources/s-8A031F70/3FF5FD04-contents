@@ -1,0 +1,237 @@
+---
+title: "Biostat 200C Homework 1 solution"
+subtitle: Due Apr 12 @ 11:59PM
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+
+To submit homework, please upload both RMD and pdf files to CCLE by the deadline.
+
+## Q1. Binomial Distribution
+
+Let $Y_i$ be the number of successes in $n_i$ trials with 
+
+$$Y_i\sim Bin(n_i, \pi_i),$$
+where the probabilities $\pi_i$ have a Beta distribution
+
+$$ \pi_i \sim Beta(\alpha,\beta).$$
+The probability density function for the Beta distribution is $f(x;\alpha, \beta) = x^{\alpha-1}(1-x)^{\beta -1}/B(\alpha,\beta)$ for $x\in [0,1], \alpha>0, \beta>0$, and the beta function $B(\alpha,\beta)$ defining the normalizing constant required to ensure that $\int_0^1f(x;\alpha, \beta) = 1$. Let $\theta = \alpha/(\alpha +\beta)$, show that
+
+\begin{itemize}
+\item[a.] $E(\pi_i) = \theta$ 
+\item[b.] $Var(\pi_i) = \theta(1-\theta)/(\alpha +\beta+1) = \phi\theta(1-\theta)$ 
+\item[c.] $E(Y_i) = n_i\theta$ 
+\item[d.] $Var(Y_i) =n_i \theta(1-\theta)[1+(n_i-1)\phi]$ so that  $Var(Y_i)$ is larger than the Binomial variance (unless $n_i=1$ or $\phi = 0$).
+
+\end{itemize}
+
+# solution 
+
+a.
+
+$E(\pi_i)$ = 
+$\int_{0}^{1}{x x^{\alpha -1}(1-x)^{\beta-1} \over B(\alpha,\beta)} dx$ = 
+${1\over B(\alpha,\beta)} \int_{0}^{1}{ x^{(\alpha +1) -1}(1-x)^{\beta-1} } dx$  =
+${B(\alpha + 1,\beta)\over B(\alpha,\beta)}$ = 
+${r(\alpha + \beta) \over r(\alpha)r(\beta)}{ r(\alpha +1)r(\beta) \over r(\alpha+1+\beta)}$ =
+${r(\alpha + \beta) \over r(\alpha)r(\beta)}{\alpha r(\alpha)r(\beta) \over (\alpha + \beta) r(\alpha+\beta)}$ =
+${\alpha \over {\beta + \alpha}}$ = $\theta$
+
+b.
+
+$E(\pi_i^2)$ = 
+$\int_{0}^{1}{x^2 x^{\alpha -1}(1-x)^{\beta-1} \over B(\alpha,\beta)} dx$ = 
+${1\over B(\alpha,\beta)} \int_{0}^{1}{ x^{(\alpha +2) -1}(1-x)^{\beta-1} } dx$ =
+${B(\alpha + 2,\beta)\over B(\alpha,\beta)}$ =
+${r(\alpha + \beta) \over r(\alpha)r(\beta)}{ r(\alpha +2)r(\beta) \over r(\alpha+2+\beta)}$ =
+${r(\alpha + \beta) \over r(\alpha)r(\beta)}{\alpha (\alpha+1) r(\alpha)r(\beta) \over (\alpha + \beta)  (\alpha + \beta + 1) r(\alpha+\beta)}$ =
+${\alpha (\alpha + 1)  \over ({\beta + \alpha}) ({\beta + \alpha +1})}$ 
+
+Var = $E(\pi_i^2)$ - $E(\pi_i)^2$ = ${\alpha^2 \over ({\beta + \alpha})^2}$ - ${\alpha (\alpha + 1)  \over ({\beta + \alpha}) ({\beta + \alpha +1})}$ = ${\alpha \beta \over ({\beta + \alpha +1}) ({\beta + \alpha})^2}$ = 
+$\theta (1-\theta) \over {\beta + \alpha +1}$ = $\phi \theta (1-\theta)$
+
+ $\phi =  {1 \over \beta + \alpha +1}$
+
+
+c.
+
+$E(Y_i)$ = $E_{\pi_i} (E(Y_i|\pi_i ))$ = 
+$E_{\pi_i} (n_i\pi_i ))$ = $\theta \pi_i$
+
+d.
+$Var(Y_i)$ = $var_{\pi_i}(E(Y|\pi_i))$ + $E_{\pi_i}(Var(Y|\pi_i))$ = 
+$n^2\theta  \pi (1-\pi)$ +$n(E\pi_i(1-\pi_i))$ =$n^2\theta  \pi (1-\pi)$ +
+$n(\theta -(\theta^2 + \phi \theta (1-\theta)))$ =$n^2\theta  \pi (1-\pi)$ +
+$\theta(1-\theta)(1 -\pi)$ =
+$n\theta(1-\theta)[1+(n-1) \pi]$
+
+
+## Q2. (ELMR Chapter 3 Exercise 1) 
+
+A case-control study of esophageal cancer in Ileet-Vilaine, France. 
+```{r}
+library(gtsummary)
+library(tidyverse)
+library(pROC)
+data(esoph)
+help(esoph)
+```
+
+### a. Plot the proportion of cases against each predictor using the size of the point to indicate the number of subject as seen in Figure 2.7. Comment on the realtionships seen in the plots.
+
+Solution:
+
+```{r}
+ esoph %>% 
+  mutate(pro = ncases/(ncases + ncontrols)) %>% 
+  ggplot() +
+  geom_point(
+    mapping = aes(x = tobgp , y = pro, size = (ncases + ncontrols ))
+  )
+```
+
+for group that consume more tobacco consumption, the proportion of cases is higher
+
+```{r}
+ esoph %>% 
+  mutate(pro = ncases/(ncases + ncontrols)) %>% 
+  ggplot() +
+  geom_point(
+    mapping = aes(x = alcgp , y = pro, size = (ncases + ncontrols ))
+  )
+```
+
+for group that consume more alcohol consumption, the proportion of cases is higher
+
+```{r}
+ esoph %>% 
+  mutate(pro = ncases/(ncases + ncontrols)) %>% 
+  ggplot() +
+  geom_point(
+    mapping = aes(x =  agegp , y = pro, size = (ncases + ncontrols ))
+  )
+```
+
+the cases of proportion are higher in age between 45 - 74
+
+
+
+### b. Fit a binomial GLM with interactions between all three predictors. Use AIC as a criterion to select a model using the `step` function. Which model is selected?
+
+Solution:
+
+```{r}
+glmmodel <- glm(cbind(ncases, ncontrols) ~ (agegp + alcgp + tobgp)^2,
+family = "binomial", data = esoph)
+summary(glmmodel)
+step(glmmodel, trace = TRUE, direction = "both")
+```
+
+full model has higher AIC, so not drop
+
+### c. All three factors are ordered and so special contrasts have been used appropriate for ordered factors involving linear, quadratic and cubic terms. Further simplification of the model may be possible by eliminating some of these terms. Use the `unclass` function to convert the factors to a numerical representation and check whether the model may be simplified.
+
+Solution:
+
+```{r}
+glmmodel1 <- glm(cbind(ncases, ncontrols) ~ (unclass(agegp) + unclass(alcgp) + unclass(tobgp)), family = "binomial", data = esoph)
+summary(glmmodel1)
+```
+
+
+### d. Use the summary output of the factor model to suggest a model that is slightly more complex than the linear model proposed in the previous question.
+
+Solution:
+
+
+```{r}
+nointer <- glm(cbind(ncases, ncontrols) ~ (agegp + alcgp + tobgp),family = "binomial"
+            ,data = esoph)
+nointer %>% 
+  tbl_regression
+summary(glmmodel1)
+```
+
+only age quandratic have significant, so we conclude age quandratic and age linear, 
+alcgp linear and tobgp in the model
+
+
+### e. Does your final model fit the data? Is the test you use appropriate for this data?
+
+Solution:
+
+
+it have siginicant difference with null model
+```{r}
+esoph$quandratic <- unclass(esoph$agegp)^2
+fitmodel <- glm(cbind(ncases, ncontrols) ~ (unclass(agegp) + unclass(alcgp) + unclass(tobgp) 
+                                             + quandratic),
+                 family = "binomial",
+                 data = esoph)
+```
+
+
+
+```{r}
+predprob <- predict(fitmodel, type = "response")
+px2 <- sum((esoph$ncases - (esoph$ncases + esoph$ncontrols) * predprob)^2 / ((esoph$ncases +esoph$ncontrols) * predprob * (1 - predprob)))
+pchisq(px2, fitmodel$df.residual, lower.tail = FALSE)
+```
+
+This large p-value indicates that this model fits data well.
+
+### f. Check for outliers in your final model.
+
+Solution:
+```{r}
+library(faraway)
+halfnorm(hatvalues(fitmodel), ylab = "Sorted leverages")
+```
+
+78 and 63 are outliers
+
+
+```{r}
+halfnorm(cooks.distance(fitmodel))
+```
+
+67 and 71
+
+
+```{r}
+esoph %>%
+ mutate(devres = residuals(fitmodel, type = "deviance"),
+ linpred = predict(fitmodel, type = "link")) %>%
+ ggplot + 
+ geom_point(mapping = aes(x = linpred, y = devres)) +
+ labs(x = "Linear predictor", y = "Deviance residual")
+```
+
+
+### g. What is the predicted effect of moving one category higher in alcohol consumption?
+
+Solution:
+
+```{r}
+coef(fitmodel)
+```
+
+controling age and totacco, one unit increase in alcohol consumption increases the odds of  cases by e^1.0651087 = 2.901154
+
+### h. Compute a 95% confidence interval for this predicted effect.
+
+Solution:
+
+```{r}
+confint(fitmodel)
+```
+
+confidence interval is from 2.373678(e^0.8644407) to 3.578623(exp(1.2749782)).
+
+
