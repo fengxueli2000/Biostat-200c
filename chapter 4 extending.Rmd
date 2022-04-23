@@ -1,0 +1,75 @@
+---
+title: "chapter 4"
+author: "Fengxue Li"
+date: '2022-04-22'
+output: html_document
+---
+
+```{r}
+library(faraway)
+library(tidyverse)
+library(ggplot2)
+library(gtsummary)
+```
+
+# practice
+```{r}
+data(babyfood, package="faraway")
+xtabs(disease/(disease + nondisease) ~ sex + food, babyfood)
+data(bliss, package="faraway")
+lmod <- glm(cbind(dead,alive) ~ conc, family=binomial,data=bliss)
+lmodsum <- summary(lmod)
+x0 <- c(1,2.5)
+eta0 <- sum(x0 * coef(lmod))
+ilogit(eta0)
+(cm <- lmodsum$cov.unscaled)
+se <- sqrt( t(x0) %*% cm %*% x0)
+ilogit(c(eta0-1.96*se,eta0+1.96*se))
+predict(lmod,newdata = data.frame(conc=2.5),se = T)
+ilogit(c(0.58095-1.96*0.2263,0.58095+1.96*0.2263))
+x0 <- c(1,-5)
+se <- sqrt( t(x0) %*% cm %*% x0)
+eta0 <- sum(x0*lmod$coef)
+ilogit(eta0)
+ilogit(c(eta0-1.96*se,eta0+1.96*se))
+
+babyfood %>%
+# change reference level to Breast and Girl
+mutate(food = relevel(food, ref = "Breast"), sex = relevel(sex, ref = "Girl")) %>%
+pivot_longer(disease:nondisease, names_to = "dis", values_to = "count") %>%
+mutate(dis = relevel(as.factor(dis), ref = "nondisease")) %>%
+glm(sex ~ dis + food, family = binomial, weights = count, data = .) %>%
+tbl_regression(intercept = TRUE, exponentiate = TRUE)
+```
+
+
+```{r}
+data("chredlin", package="faraway")
+cc <- chredlin
+cc$logincome <- log10(cc$income)
+hist(chredlin$involact,breaks = 40)
+lomd <- lm(involact ~ race + fire + theft +
+             age + logincome + side, cc)
+summary(lomd)
+```
+
+logincome and side have no significant difference
+
+```{r}
+plot(lomd$fitted.values,lomd$residuals)
+```
+
+```{r}
+cc$res <- ifelse(cc$involact == 0, 1,0)
+lomd2 <- glm(res ~ race + fire + theft +
+             age + logincome + side, family=binomial, cc)
+summary(lomd2)
+```
+```{r}
+lomd3 <- glm(res ~ race + age , family=binomial, cc)
+summary(lomd3)
+```
+```{r}
+lomd4 <- glm(res ~ race + age , family=binomial(link = probit) , cc)
+summary(lomd4)
+```
