@@ -1,0 +1,66 @@
+---
+title: "chapter 5"
+author: "Fengxue Li"
+date: '2022-04-23'
+output: html_document
+---
+
+```{r}
+library(faraway)
+library(tidyverse)
+library(ggplot2)
+library(gtsummary)
+library(MASS)
+library(pscl)
+```
+
+```{r}
+data("gala")
+gala <- gala[,-2]
+modl <- lm(Species ~ . , gala)
+plot(modl, 1)
+modt <- lm(sqrt(Species) ~ . , gala)
+plot(modt, 1)
+sumary(modt)
+modp <- glm(Species ~., family = poisson, gala)
+summary(modp)
+pchisq(modp$deviance, modp$df.residual,lower=FALSE)
+halfnorm(residuals(modp))
+modd <- glm(Species ~ ., family=quasipoisson, gala)
+drop1(modd)
+drop1(modd,test="F")
+data("dicentric")
+round(xtabs(ca/cells ~ doseamt+doserate, dicentric),2)
+lmod <- lm(ca/cells ~ log(doserate)*factor(doseamt), dicentric)
+summary(lmod)
+dicentric$dosef <- factor(dicentric$doseamt)
+pmod <- glm(ca ~ log(cells) + log(doserate)*dosef,
+            family = poisson, dicentric)
+summary(pmod)
+rmod <- glm(ca ~ offset(log(cells))+log(doserate)*dosef, family=poisson,dicentric)
+sumary(rmod)
+data(solder)
+modp <- glm(skips ~ . , family=poisson, data=solder)
+summary(modp)
+c(deviance(modp), df.residual(modp))
+pchisq(modp$deviance, modp$df.residual,lower=FALSE)
+modp2 <- glm(skips ~ (Opening +Solder + Mask + PadType 
+                      + Panel)^2 ,
+             family=poisson, data=solder)
+summary(modp2)
+pchisq(modp2$deviance, modp2$df.residual,lower=FALSE)
+modn <- glm(skips ~ .,negative.binomial(1),solder)
+summary(modn)
+modn <- glm.nb(skips ~ .,solder)
+summary(modn)
+modp <- glm(art ~ ., data=bioChemists, family=poisson)
+summary(modp)
+ocount <- table(bioChemists$art)[1:8]
+modh <- hurdle(art ~ ., data=bioChemists)
+summary(modh)
+modz <- zeroinfl(art ~ ., data=bioChemists)
+summary(modz)
+```
+
+
+
