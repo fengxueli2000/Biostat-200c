@@ -1,6 +1,0 @@
-"0","ggplot(pima, aes(x=insulin, color=test1)) + 
-            geom_histogram()
-"
-"2","`stat_bin()` using `bins = 30`. Pick better value with
-`binwidth`.
-"

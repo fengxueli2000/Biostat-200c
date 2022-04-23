@@ -1,4 +1,0 @@
-"0","lmod_roc <- roc( Class ~pred, wbca, smoothed = TRUE)
-"
-"2","Error in eval(predvars, data, env) : object 'pred' not found
-"
